@@ -1,7 +1,8 @@
 import pygame
 from background import Background1, Background2
-from title import Title, End
+from title import Title, End, Countdown
 from player import Player
+from npc import NPC
 import math
 pygame.init()
 
@@ -18,6 +19,7 @@ bgt = pygame.Surface(SIZE)
 bgt.fill((255,255,255))
 title = Title(WIDTH/2, HEIGHT/2)
 end = End(WIDTH/2, HEIGHT/2)
+countdown = Countdown(WIDTH/2, HEIGHT/2)
 
 bg_size = ((14 * TS, 11 * TS))
 bg1 = Background1(bg_size, TS)
@@ -25,8 +27,6 @@ bg1.make_bg()
 
 bg2 = Background2(bg_size, TS)
 bg2.make_bg()
-
-player = Player(1.5 * TS, 10.5 * TS)
 
 #add a big loop in order to keep playing
 playing = 1
@@ -61,10 +61,37 @@ while playing:
     else:
         bg = bg2
 
-    player = Player(1.5 * TS, 10.5 * TS)
+    player = Player(1.5 * TS -14, 10.5 * TS)
+    npc = NPC(1.5 * TS + 14, 10.5 * TS, bg.waypoints, r"kenney_racing-pack\PNG\Cars\car_red_1.png", 3.7)
+    npc2 = NPC(1.5 * TS, 10.6 * TS, bg.waypoints, r"kenney_racing-pack\PNG\Cars\car_green_1.png", 3.9)
+    player_won = 0
 
     def touching(player, grass):
         return player.hitbox.colliderect(grass.rect)
+    
+    
+    counting = running
+    countdown.start()
+    while counting:
+        events = pygame.event.get()
+        for e in events:
+            if e.type == pygame.QUIT:
+                counting = 0
+                running = 0
+                playing = 0
+        
+        bg.draw(screen)
+        npc.draw(screen)
+        npc2.draw(screen)
+        player.draw(screen)
+        countdown.draw(screen)
+        
+        pygame.display.flip()
+        clock.tick(60)
+        
+        if countdown.done():
+            counting = 0
+            
 
     #start timer
     start_time = pygame.time.get_ticks()
@@ -93,6 +120,10 @@ while playing:
         #call the player update
         player.update(keys, on_grass)
         
+        #call npc update
+        npc.update()
+        npc2.update()
+        
         #check to see if the car finished the race
         if chosen == 1:
             if player.y > HEIGHT and 4 * TS < player.x < 5 * TS:
@@ -100,6 +131,12 @@ while playing:
         else:
             if player.y < 0 and 12 * TS < player.x < 14 * TS:
                 finished = 1
+                
+        if finished == 0 and (npc.finished == 1 or npc2.finished==1):
+            finished = 1
+            player_won = 0
+        elif finished == 1:
+            player_won = 1
                     
         if finished == 1:
             race_time = (pygame.time.get_ticks() - start_time) / 1000
@@ -107,6 +144,8 @@ while playing:
             running = 0
         
         bg.draw(screen)
+        npc.draw(screen)
+        npc2.draw(screen)
         player.draw(screen)
         
         pygame.display.flip()
@@ -116,6 +155,7 @@ while playing:
     if finished == 1:
         running = 1
         end.race_time(race_time)
+        end.results(player_won)
     else:
         running = 0
         

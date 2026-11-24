@@ -78,7 +78,17 @@ class End():
         self.time_surface = self.end_font.render("Time: " + str(float(race_time)) + "seconds", 1, (100,100,255))
         self.time_rect = self.time_surface.get_rect()
         self.time_rect.center = (self.x, self.y+50)
-        
+    
+    def results(self, won):
+        #make words depending on who won
+        if won == 1:
+            words = "You won! Nice Job!"
+        else:
+            words = "You just lost to an NPC"
+        self.end_surface = self.end_font.render(words, 1, (100,100,255))
+        self.end_rect = self.end_surface.get_rect()
+        self.end_rect.center = (self.x, self.y-50)
+    
     def draw(self, screen):
         mouse_pos = pygame.mouse.get_pos()
         screen.blit(self.end_surface, self.end_rect)
@@ -96,4 +106,32 @@ class End():
             return 1
         return 0
         
+class Countdown():
+    def __init__(self, x, y):
+        #make font for numbers
+        self.font_fn = r"orange juice 2.0.ttf"
+        self.count_font = pygame.font.Font(self.font_fn, 200)
+            
+        #make the numbers
+        self.numbers = []
+        for n in [3,2,1]:
+            surface = self.count_font.render(str(n), 1, (0,0,0))
+            rect = surface.get_rect()
+            rect.center = (x,y)
+            self.numbers.append((surface, rect))
+            
+        self.start_time = 0
         
+    def start(self):
+        self.start_time = pygame.time.get_ticks()
+        
+    def seconds(self):
+        return (pygame.time.get_ticks() -self.start_time) / 1000
+    
+    def done(self):
+        return self.seconds() >= 3
+    
+    def draw(self, screen):
+        index = min(int(self.seconds()), 2)
+        surface, rect = self.numbers[index]
+        screen.blit(surface, rect)

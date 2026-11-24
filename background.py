@@ -52,6 +52,13 @@ class Background1():
             for c in range(len(self.tile_matrix[r])):
                 if self.tile_matrix[r][c] is grass:
                     self.grass_group.add(Grass(c*ts, r*ts, ts))
+                    
+        #make the path for the waypoints in oreder to keep npc on the road
+        path = [(1,1), (12,1), (12,4), (4,4), (4,7), (12,7), (12,9), (4,9), (4,12)]
+        self.waypoints = []
+        for c, r in path:
+            self.waypoints.append(((c + 0.5) * ts, (r + 0.5) * ts))
+            
                         
     #function that works like rotozoom
     def load(self, fp, ts, angle=0):
@@ -127,6 +134,12 @@ class Background2():
             for c in range(len(self.tile_matrix[r])):
                 if self.tile_matrix[r][c] is grass:
                     self.grass_group.add(Grass(c*ts, r*ts, ts))
+                    
+        #make path for map two
+        path = [(1,9), (12,9), (12,7), (1,7), (1,5), (12,5), (12,3), (1,3), (1,1), (12,1), (12,-2)]
+        self.waypoints = []
+        for c, r in path:
+            self.waypoints.append(((c + 0.5) * ts, (r + 0.5) * ts))
 
     
     
